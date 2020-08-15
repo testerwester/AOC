@@ -5,75 +5,75 @@ namespace AOC2
 {
     class Program
     {
+        /*  Constant used for Program counter   */
+        public const int OPLENGTH = 4;
+
         static void Main(string[] args)
         {
 
             string[] values = CsvToArray("AOCInput2.txt");
             int[] opcodes = StrToInt(values);
 
+            /*  Manually change index 1 and 2 according to task description */
+            opcodes[1] = 12; 
+            opcodes[2] = 2;
+            Console.WriteLine("----------------------------------------------------");
             RunProgram(opcodes);
+
+             
+            
 
         }
 
 
         private static void RunProgram(int[] ops)
         {
-            int opLength = 4;
-            int PC = 0;
+            int PC = 0; //ProgramCounter for opcodes
 
-            Console.WriteLine("Hello from RunProgram");
-
-            while(ops[PC] != 99)
+            /*  Runs instructions as long as opcodes are accepted by runOP   */
+            while(runOP(PC, ops))
             {
-                runOP(PC, ops);
-                PC += opLength;
+                PC += OPLENGTH;
             }
-            
 
-
-
-            
+            /*  End output to test program */
+            Console.WriteLine("----------------------------------------------------");
+            Console.WriteLine($"Value at position 0 is: {ops[0]}");
+            Console.WriteLine("----------------------------------------------------");
         }
 
-        private static int runOP(int PC, int[] opArr)
+        private static bool runOP(int PC, int[] opArr)
         {
+            int opOneIndex = opArr[PC + 1];
+            int oPTwoIndex = opArr[PC + 2];
+            int destIndex = opArr[PC + 3];
+
+            Console.Write($"PC {PC}: ");
+
             switch(opArr[PC])
             {
                 case 1:
-                    Console.WriteLine("Instruction one");
-                    opArr[(PC + 3)] = opArr[PC + 1] + opArr[PC + 2];
-                    return 1;
+                    Console.WriteLine($"At index {opArr[(PC + 3)]} setting {opArr[(PC + 1)]} + {opArr[(PC + 2)]}");
+                    opArr[destIndex] = opArr[opOneIndex] + opArr[oPTwoIndex];
+                    return true;
 
                 case 2:
-                    Console.WriteLine("Instruction Two");
-                    opArr[(PC + 3)] = opArr[PC + 1] * opArr[PC + 2];
-                    return 2;
+                    Console.WriteLine($"At index {opArr[(PC + 3)]} setting {opArr[(PC + 1)]} * {opArr[(PC + 2)]}");
+                    opArr[destIndex] = opArr[opOneIndex] * opArr[oPTwoIndex];
+                    return true;
 
                 case 99:
-                    Console.WriteLine("Instruction END");
-                    return 99;
+                    Console.WriteLine($"Instruction END");
+                    return false;
 
                 default:
-                    return -1;
+                    Console.WriteLine($"Unknown OP code");
+                    return false;
             }
 
         }
 
 
-        private static void WriteValue(int[] opArr, int index, int value)
-        {
-            opArr[index] = value;
-        }
-
-        private static void Addition(int[] opArr, int index1, int index2, int resultIndex)
-        {
-
-        }
-
-        private static void Multiplication()
-        {
-
-        }
 
         private static int[] StrToInt(string[] arr)
         {
@@ -82,7 +82,6 @@ namespace AOC2
             for(int i = 0; i<arr.Length; i++)
             {
                 intArr[i] = Int32.Parse(arr[i]);
-                Console.WriteLine(arr[i]);
             }
 
             return intArr;
@@ -106,6 +105,7 @@ namespace AOC2
 
 
                     //VAD HÄNDER OM MER ÄN 1024 tecken?????????+
+                    //Bygg någon kontrollfunktion
                     return characters;
                 }
 
