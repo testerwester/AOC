@@ -10,28 +10,33 @@ namespace AOC8
         /*  Constants   */
         public const string IMAGE_PATH = "AOC8Input.txt";
         public const int BUFF_SIZE = 15000;
-        public const int IMG_WIDTH = 25;
-        public const int IMG_HEIGHT = 6;
+
 
 
         public class Layer
         {
+            /*  Constants   */
+            public const int IMG_WIDTH = 25;
+            public const int IMG_HEIGHT = 6;
             /*  Variables   */
             public int[,] codes;
-            public int numZeroes;
 
+            /*  Creates an empty 2d array based */
             public Layer()
             {
                 codes = new int[IMG_HEIGHT, IMG_WIDTH];
-                numZeroes = 0;
             }
 
-            public void WriteRow(int index, int[] values)
+            /*  When a specific value should be written to all spots    */
+            public Layer(int input)
             {
-                for(int i = 0; i<IMG_WIDTH; i++)
+                codes = new int[IMG_HEIGHT, IMG_WIDTH];
+                for(int i = 0; i < IMG_HEIGHT; i++)
                 {
-                    this.codes[index, i] = values[i];
-                    if (values[i] == 0) numZeroes++;
+                    for(int j = 0; j < IMG_WIDTH; j++)
+                    {
+                        codes[i, j] = input;
+                    }
                 }
             }
 
@@ -47,9 +52,23 @@ namespace AOC8
                         if (codes[i, j] == numToCount) counter++;
                     }
                 }
-
-                if(numToCount == 0) this.numZeroes = counter; //Failsafe since nuMZeroes is public
                 return counter;
+            }
+
+            public void PrintImage()
+            {
+                int column, row;
+
+                for(column = 0; column < IMG_HEIGHT; column++)
+                {
+                    for(row = 0; row < IMG_WIDTH; row++)
+                    {
+                        if (codes[column, row] != 0) Console.Write($"{codes[column, row]}");
+                        else Console.Write(" ");
+                    }
+                    Console.WriteLine("");
+                }
+
             }
             
         }
@@ -57,7 +76,7 @@ namespace AOC8
 
         static void Main(string[] args)
         {
-            int lowestIndex;
+            int checkIndex;
             Layer[] layers;
             char[] rawData = new char[BUFF_SIZE];
 
@@ -65,16 +84,46 @@ namespace AOC8
             {
                 /*  Part one    */
                 layers = PopulateLayers(rawData);
-                lowestIndex = FindCheckLayer(layers);
+                checkIndex = FindCheckLayer(layers);
 
-                Console.WriteLine($"The value of 1 * 2 is: " +
-                    $"{(layers[lowestIndex].CalculateOccurances(1) * layers[lowestIndex].CalculateOccurances(2))}");
+                Console.WriteLine($"1. The value of 1's * 2's is: " +
+                    $"{(layers[checkIndex].CalculateOccurances(1) * layers[checkIndex].CalculateOccurances(2))}");
+
+                /*  Part Two    */
+                Layer endLayer = new Layer(2);
+                ComposeLayers(endLayer, layers);
+                Console.WriteLine("2. BIOS Password:");
+                endLayer.PrintImage();
+
             }
+        }
+
+        public static void ComposeLayers(Layer endLayer, Layer[] layers)
+        {
+            int numLayers = layers.Length;
+            int i, row, column;
+
+            for(i = 0; i<numLayers; i++)
+            {
+                for(column = 0; column < Layer.IMG_HEIGHT; column++)
+                {
+                    for(row = 0; row < Layer.IMG_WIDTH; row++)
+                    {
+                        if(endLayer.codes[column, row] == 2)
+                        {
+                            /*  More efficient to write than an extra if statement? ( ..&& layers[i].codes[column, row]*/
+                            endLayer.codes[column, row] = layers[i].codes[column, row];
+                        }
+                    }
+                }
+            }
+            
+
         }
 
         public static int FindCheckLayer(Layer[] layers)
         {
-            int lowestNum = (IMG_HEIGHT * IMG_WIDTH);
+            int lowestNum = (Layer.IMG_HEIGHT * Layer.IMG_WIDTH);
             int lowestIndex = -1;
             int num;
 
@@ -94,8 +143,7 @@ namespace AOC8
 
         public static Layer[] PopulateLayers(char[] rawFile)
         {
-            int numLayers = rawFile.Length / (IMG_WIDTH * IMG_HEIGHT);
-            int[] rowBuffer = new int[IMG_WIDTH];
+            int numLayers = rawFile.Length / (Layer.IMG_WIDTH * Layer.IMG_HEIGHT);
             int pointer = 0;
 
             Layer[] layers = new Layer[numLayers];
@@ -105,12 +153,13 @@ namespace AOC8
                 /*  Creates one layer per loop  */
                 layers[i] = new Layer();
 
-                for(int row = 0; row < IMG_HEIGHT; row++)
+                for(int column = 0; column < Layer.IMG_HEIGHT; column++)
                 {
-                    for (int column = 0; column < IMG_WIDTH; column++)
+                    for (int row = 0; row < Layer.IMG_WIDTH; row++)
                     {
                         /*  Takes one sign, converts to int and stores in layer */
-                        layers[i].codes[row, column] = Int32.Parse(rawFile[pointer++].ToString());
+                        layers[i].codes[column, row] = Int32.Parse(rawFile[pointer++].ToString());
+                        //Convert from char to string to int feels awkward. 
                     }
                 }
             }
@@ -142,8 +191,6 @@ namespace AOC8
             }
 
             return imageInput;
-
-           
         }
     }
 }
