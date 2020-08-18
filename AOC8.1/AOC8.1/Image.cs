@@ -36,7 +36,7 @@ namespace AOC8._1
                     {
                         if (endLayer.GetSingle(column, row) == Layer.COL_TRANSPARENT)
                         {
-                            endLayer.SetSingle(column, row, layers[i].codes[column, row]);
+                            endLayer.SetSingle(column, row, layers[i].GetSingle(column, row));
                         }
                     }
                 }

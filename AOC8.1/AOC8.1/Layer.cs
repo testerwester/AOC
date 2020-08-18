@@ -14,7 +14,7 @@ namespace AOC8._1
         public const int COL_WHITE = 1;
         public const int COL_TRANSPARENT = 2;
         /*  Variables   */
-        public int[,] codes;
+        private int[,] codes;
 
 
         /*  Creates an empty 2d array based */
